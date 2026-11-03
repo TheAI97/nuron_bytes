@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neurons Byte: The CS Classroom</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: ['class', '[data-theme="dark"]'],
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --card-bg: #ffffff;
+            --card-border: rgba(0, 0, 0, 0.15);
+            --text-primary: #111111;
+            --text-secondary: #555555;
+            --btn-summary-bg: #e2e8f0;
+            --btn-summary-text: #0f172a;
+            
+            --admin-card-bg: #111111;
+            --admin-card-text: #ffffff;
+            --admin-input-bg: #1f1f1f;
+            --admin-input-border: rgba(255, 255, 255, 0.2);
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #050505;
+            --card-bg: #121212;
+            --card-border: rgba(255, 255, 255, 0.18);
+            --text-primary: #ffffff;
+            --text-secondary: #999999;
+            --btn-summary-bg: #27272a;
+            --btn-summary-text: #f4f4f5;
+            
+            --admin-card-bg: #ffffff;
+            --admin-card-text: #111111;
+            --admin-input-bg: #f3f4f6;
+            --admin-input-border: rgba(0, 0, 0, 0.2);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            transition: background-color 0.4s ease, color 0.4s ease;
+            overflow-x: hidden;
+            font-weight: 500;
+            letter-spacing: -0.01em;
+        }
+
+        .glass-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            box-shadow: 0 10px 30px 0 rgba(0, 0, 0, 0.05);
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        .admin-inverted-card {
+            background: var(--admin-card-bg) !important;
+            color: var(--admin-card-text) !important;
+            border: 1px solid var(--card-border);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            transition: all 0.35s ease;
+        }
+
+        .admin-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 0.75rem;
+            background: var(--admin-input-bg);
+            border: 1px solid var(--admin-input-border);
+            color: var(--admin-card-text);
+            font-size: 12px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        .admin-input:focus {
+            border-color: currentColor;
+        }
+
+        .btn-view-summary {
+            background: var(--btn-summary-bg);
+            color: var(--btn-summary-text);
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            font-size: 11px;
+            border: 1px solid var(--card-border);
+            transition: all 0.3s ease;
+            padding: 0.85rem 1.4rem;
+            border-radius: 9999px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-view-summary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+            opacity: 0.95;
+        }
+
+        .exact-logo-box {
+            background: linear-gradient(145deg, #4a4a4a, #222222);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 1.15rem;
+            transition: all 0.3s ease;
+        }
+
+        [data-theme="light"] .exact-logo-box {
+            background: linear-gradient(145deg, #71717a, #3f3f46);
+        }
+
+        .nav-btn {
+            background: transparent;
+            border: 1px solid var(--card-border);
+            transition: all 0.3s ease;
+            font-weight: 600;
+            color: var(--text-secondary);
+            padding: 0.65rem 1.25rem;
+            border-radius: 1rem;
+        }
+
+        .nav-btn:hover {
+            border-color: var(--text-primary);
+            color: var(--text-primary);
+        }
+
+        .nav-btn.active {
+            background: var(--text-primary);
+            color: var(--bg-color);
+            border-color: var(--text-primary);
+        }
+
+        .tab-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            color: var(--text-secondary);
+            padding: 0.5rem 1.1rem;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.25s ease;
+        }
+
+        .tab-btn:hover, .tab-btn.active {
+            background: var(--text-primary);
+            color: var(--bg-color);
+            border-color: var(--text-primary);
+        }
+
+        .btn-aesthetic {
+            background: var(--text-primary);
+            color: var(--bg-color);
+            font-weight: 700;
+            transition: all 0.3s ease;
+            padding: 0.85rem 1.5rem;
+            border-radius: 1rem;
+        }
+
+        [data-theme="light"] .admin-inverted-card .btn-aesthetic {
+            background: #ffffff;
+            color: #111111;
+        }
+        [data-theme="dark"] .admin-inverted-card .btn-aesthetic {
+            background: #111111;
+            color: #ffffff;
+        }
+
+        .btn-aesthetic:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .btn-delete {
+            background: #ef4444;
+            color: #ffffff;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            padding: 0.4rem 0.8rem;
+            border-radius: 0.5rem;
+            font-size: 11px;
+        }
+
+        .btn-delete:hover {
+            background: #dc2626;
+            transform: translateY(-1px);
+        }
+
+        #neural-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.55;
+        }
+    </style>
+</head>
+<body class="min-h-screen relative flex flex-col justify-between">
+
+    <canvas id="neural-canvas"></canvas>
+
+    <div class="relative z-10 flex flex-col min-h-screen">
+        <!-- Navigation Header -->
+        <header class="sticky top-0 z-40 w-full glass-card border-b border-t-0 border-x-0 px-6 sm:px-12 py-4">
+            <div class="max-w-7xl mx-auto flex flex-col lg:flex-row justify-between items-center gap-6">
+                <div class="flex items-center gap-4 w-full lg:w-auto justify-between">
+                    <div class="flex items-center gap-4">
+                        <div class="relative flex items-center justify-center w-12 h-12 exact-logo-box overflow-hidden shrink-0 p-2.5">
+                            <svg class="w-full h-full text-white" viewBox="0 0 500 500" fill="none">
+                                <circle cx="250" cy="250" r="48" fill="currentColor"/>
+                                <line x1="250" y1="250" x2="160" y2="160" stroke="currentColor" stroke-width="22" stroke-linecap="round"/>
+                                <line x1="250" y1="250" x2="340" y2="160" stroke="currentColor" stroke-width="22" stroke-linecap="round"/>
+                                <line x1="250" y1="250" x2="160" y2="340" stroke="currentColor" stroke-width="22" stroke-linecap="round"/>
+                                <line x1="250" y1="250" x2="340" y2="340" stroke="currentColor" stroke-width="22" stroke-linecap="round"/>
+                                <circle cx="160" cy="160" r="32" stroke="currentColor" stroke-width="20" fill="none"/>
+                                <circle cx="340" cy="160" r="32" stroke="currentColor" stroke-width="20" fill="none"/>
+                                <circle cx="160" cy="340" r="32" stroke="currentColor" stroke-width="20" fill="none"/>
+                                <circle cx="340" cy="340" r="32" stroke="currentColor" stroke-width="20" fill="none"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h1 class="text-xl font-bold tracking-tight">Neurons Byte</h1>
+                            <p class="text-[10px] font-mono font-medium tracking-widest text-neutral-400 uppercase">The CS Classroom</p>
+                        </div>
+                    </div>
+                    <button onclick="toggleTheme()" class="lg:hidden p-3 rounded-xl glass-card">
+                        <i class="fa-solid fa-moon text-lg" id="themeIconMobile"></i>
+                    </button>
+                </div>
+
+                <nav class="flex items-center gap-3 overflow-x-auto w-full lg:w-auto pb-2 lg:pb-0">
+                    <button onclick="switchPage('home')" id="nav-home" class="nav-btn active text-xs flex items-center gap-2 shrink-0">
+                        <i class="fa-solid fa-house"></i> Home
+                    </button>
+                    <button onclick="switchPage('lectures')" id="nav-lectures" class="nav-btn text-xs flex items-center gap-2 shrink-0">
+                        <i class="fa-solid fa-video"></i> Video Lectures
+                    </button>
+                    <button onclick="switchPage('notes')" id="nav-notes" class="nav-btn text-xs flex items-center gap-2 shrink-0">
+                        <i class="fa-solid fa-file-pdf"></i> Study Notes
+                    </button>
+                    <button onclick="switchPage('about')" id="nav-about" class="nav-btn text-xs flex items-center gap-2 shrink-0">
+                        <i class="fa-solid fa-circle-info"></i> About Us
+                    </button>
+                </nav>
+
+                <div class="hidden lg:flex items-center gap-4">
+                    <button onclick="toggleTheme()" class="p-3 rounded-xl glass-card transition-colors">
+                        <i class="fa-solid fa-moon text-lg" id="themeIconDesktop"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Dynamic Content -->
+        <main class="max-w-7xl mx-auto px-6 sm:px-12 py-12 flex-grow w-full space-y-16">
+            
+            <!-- PAGE 1: HOME -->
+            <div id="page-home" class="page-content space-y-16">
+                <div class="text-center max-w-3xl mx-auto space-y-4 pt-4">
+                    <h2 class="text-4xl sm:text-6xl font-bold tracking-tight">Welcome to Neurons Byte</h2>
+                    <p class="text-neutral-500 text-base md:text-lg font-normal">Subject-wise & topic-wise engineering modules, high-yield PDF notes, and bilingual AI summaries.</p>
+                </div>
+
+                <section class="grid grid-cols-1 sm:grid-cols-2 gap-8 max-w-3xl mx-auto">
+                    <div class="glass-card rounded-3xl p-8 text-center space-y-3">
+                        <div class="w-12 h-12 rounded-2xl glass-card flex items-center justify-center mx-auto">
+                            <i class="fa-solid fa-video text-lg"></i>
+                        </div>
+                        <h3 id="homeLectureCount" class="text-4xl font-bold">0</h3>
+                        <p class="text-xs font-mono font-medium text-neutral-400 uppercase tracking-widest">Total Lectures Uploaded</p>
+                    </div>
+                    <div class="glass-card rounded-3xl p-8 text-center space-y-3">
+                        <div class="w-12 h-12 rounded-2xl glass-card flex items-center justify-center mx-auto">
+                            <i class="fa-solid fa-file-pdf text-lg"></i>
+                        </div>
+                        <h3 id="homePdfCount" class="text-4xl font-bold">0</h3>
+                        <p class="text-xs font-mono font-medium text-neutral-400 uppercase tracking-widest">Total Study Notes Uploaded</p>
+                    </div>
+                </section>
+
+                <section class="space-y-8">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-2xl sm:text-3xl font-bold">Featured Video Lectures</h3>
+                        <button onclick="switchPage('lectures')" class="tab-btn">View All</button>
+                    </div>
+                    <div id="homeVideoGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+                </section>
+
+                <section class="space-y-8">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-2xl sm:text-3xl font-bold">Featured Study Notes</h3>
+                        <button onclick="switchPage('notes')" class="tab-btn">View All</button>
+                    </div>
+                    <div id="homePdfGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+                </section>
+            </div>
+
+            <!-- PAGE 2: SUBJECT & TOPIC-WISE VIDEO LECTURES -->
+            <div id="page-lectures" class="page-content space-y-10 hidden">
+                <div class="space-y-4">
+                    <h3 class="text-3xl font-bold">Video Lectures</h3>
+                    <p class="text-xs font-mono text-neutral-400">Filter by Subject and browse Topic-wise modules.</p>
+                    <div id="lectureSubjectTabs" class="flex flex-wrap gap-2 pt-2"></div>
+                </div>
+                <div id="fullVideoGrid" class="space-y-12"></div>
+            </div>
+
+            <!-- PAGE 3: SUBJECT & TOPIC-WISE STUDY NOTES -->
+            <div id="page-notes" class="page-content space-y-10 hidden">
+                <div class="space-y-4">
+                    <h3 class="text-3xl font-bold">PDF Study Notes</h3>
+                    <p class="text-xs font-mono text-neutral-400">Filter by Subject and read AI Bilingual Summaries.</p>
+                    <div id="pdfSubjectTabs" class="flex flex-wrap gap-2 pt-2"></div>
+                </div>
+                <div id="fullPdfGrid" class="space-y-12"></div>
+            </div>
+
+            <!-- PAGE 4: ABOUT US -->
+            <div id="page-about" class="page-content space-y-10 hidden">
+                <section class="glass-card rounded-3xl p-10 md:p-16 space-y-6 max-w-3xl mx-auto">
+                    <h3 class="text-3xl font-bold">About Us</h3>
+                    <p class="text-neutral-500 text-base md:text-lg leading-relaxed">
+                        Neurons Byte is an interactive platform built for computer science engineering students to access structured subject-wise & topic-wise lectures, high-yield study notes, and bilingual summaries.
+                    </p>
+                </section>
+            </div>
+
+            <!-- PAGE 5: ADMIN DASHBOARD -->
+            <div id="page-admin" class="page-content space-y-10 hidden">
+                <section class="admin-inverted-card rounded-3xl p-8 md:p-12 space-y-10 shadow-2xl">
+                    <div class="flex justify-between items-center border-b border-current pb-6 opacity-90">
+                        <div>
+                            <h3 class="text-2xl sm:text-3xl font-bold">Admin Management Portal</h3>
+                            <p class="text-xs font-mono opacity-80 mt-1">Publish, Delete & Update Admin Password with Real-Time Sync.</p>
+                        </div>
+                        <button onclick="exitAdminPortal()" class="btn-aesthetic text-xs uppercase font-mono">Exit Admin</button>
+                    </div>
+
+                    <!-- Upload Forms Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <!-- Add Lecture Form -->
+                        <div class="admin-inverted-card rounded-3xl p-6 space-y-4">
+                            <h4 class="font-bold text-lg flex items-center gap-2"><i class="fa-solid fa-plus text-xs"></i> Add Lecture</h4>
+                            <div>
+                                <label class="block text-[11px] font-mono opacity-80 mb-1">Subject Name</label>
+                                <input type="text" id="adminLecSubject" placeholder="e.g. Data Structures" class="admin-input">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-mono opacity-80 mb-1">Topic Name</label>
+                                <input type="text" id="adminLecTopic" placeholder="e.g. Binary Search Trees" class="admin-input">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-mono opacity-80 mb-1">Lecture Title</label>
+                                <input type="text" id="adminLecTitle" placeholder="e.g. BST Insertion & Deletion" class="admin-input">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-mono opacity-80 mb-1">YouTube Embed URL</label>
+                                <input type="text" id="adminLecUrl" placeholder="https://www.youtube.com/embed/..." class="admin-input">
+                            </div>
+                            <button onclick="addNewLecture()" class="btn-aesthetic w-full text-xs uppercase font-mono mt-2 py-3">Publish Lecture</button>
+                        </div>
+
+                        <!-- Add PDF Note Form -->
+                        <div class="admin-inverted-card rounded-3xl p-6 space-y-4">
+                            <h4 class="font-bold text-lg flex items-center gap-2"><i class="fa-solid fa-plus text-xs"></i> Add Study Note</h4>
+                            <div>
+                                <label class="block text-[11px] font-mono opacity-80 mb-1">Subject Name</label>
+                                <input type="text" id="adminPdfSubject" placeholder="e.g. Database Systems" class="admin-input">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-mono opacity-80 mb-1">Topic Name</label>
+                                <input type="text" id="adminPdfTopic" placeholder="e.g. Normalization" class="admin-input">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-mono opacity-80 mb-1">Note Title</label>
+                                <input type="text" id="adminPdfTitle" placeholder="e.g. 1NF, 2NF, 3NF & BCNF Notes" class="admin-input">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-mono opacity-80 mb-1">English Summary</label>
+                                <textarea id="adminPdfEn" rows="2" placeholder="English summary..." class="admin-input"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-mono opacity-80 mb-1">Hindi Summary (हिंदी)</label>
+                                <textarea id="adminPdfHi" rows="2" placeholder="हिंदी विवरण..." class="admin-input"></textarea>
+                            </div>
+                            <button onclick="addNewPdfNote()" class="btn-aesthetic w-full text-xs uppercase font-mono mt-2 py-3">Publish Study Note</button>
+                        </div>
+                    </div>
+
+                    <!-- Password Update Section with Show/Hide Toggle -->
+                    <div class="admin-inverted-card rounded-3xl p-6 space-y-4">
+                        <h4 class="font-bold text-lg flex items-center gap-2"><i class="fa-solid fa-key text-xs"></i> Update Admin Password</h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
+                            <div>
+                                <label class="block text-[11px] font-mono opacity-80 mb-1">New Secure Password</label>
+                                <div class="relative">
+                                    <input type="password" id="newAdminPwd" placeholder="Enter new password" class="admin-input pr-10">
+                                    <button type="button" onclick="togglePasswordVisibility('newAdminPwd', 'toggleIconNew')" class="absolute right-3 top-1/2 -translate-y-1/2 opacity-70 hover:opacity-100">
+                                        <i class="fa-solid fa-eye text-xs" id="toggleIconNew"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div>
+                                <button onclick="updateAdminPassword()" class="btn-aesthetic w-full text-xs uppercase font-mono py-3">Save New Password</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Manage & Delete Content Section -->
+                    <div class="space-y-6 pt-6 border-t border-current opacity-90">
+                        <h4 class="font-bold text-xl flex items-center gap-2"><i class="fa-solid fa-trash-can text-red-500"></i> Manage & Delete Uploaded Content</h4>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div class="admin-inverted-card rounded-3xl p-6 space-y-4">
+                                <h5 class="font-bold text-sm opacity-80 uppercase font-mono">Uploaded Lectures List</h5>
+                                <div id="adminLecturesList" class="space-y-3 max-h-80 overflow-y-auto pr-1"></div>
+                            </div>
+                            <div class="admin-inverted-card rounded-3xl p-6 space-y-4">
+                                <h5 class="font-bold text-sm opacity-80 uppercase font-mono">Uploaded PDF Notes List</h5>
+                                <div id="adminPdfsList" class="space-y-3 max-h-80 overflow-y-auto pr-1"></div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+        </main>
+
+        <footer class="glass-card border-t border-b-0 border-x-0 py-8 px-12 text-center text-xs font-mono text-neutral-400 mt-12">
+            © 2026 Neurons Byte: The CS Classroom. All rights reserved.
+        </footer>
+    </div>
+
+    <!-- Summary Modal -->
+    <div id="summaryModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm hidden p-4">
+        <div class="glass-card rounded-3xl p-8 max-w-xl w-full relative space-y-6">
+            <button onclick="closeSummaryModal()" class="absolute top-6 right-6 opacity-70 hover:opacity-100">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+            <h3 id="modalPdfTitle" class="text-xl font-bold"></h3>
+            
+            <div class="space-y-2">
+                <span class="text-xs font-mono opacity-70 uppercase font-bold">English Summary</span>
+                <p id="modalEnglishSummary" class="text-xs leading-relaxed opacity-90"></p>
+            </div>
+            <div class="space-y-2">
+                <span class="text-xs font-mono opacity-70 uppercase font-bold">हिंदी विवरण (Hindi)</span>
+                <p id="modalHindiSummary" class="text-xs leading-relaxed opacity-90"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Login Modal with Show/Hide Toggle -->
+    <div id="adminLoginModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm hidden p-4">
+        <div class="glass-card rounded-3xl p-8 max-w-md w-full relative space-y-6">
+            <button onclick="cancelAdminLogin()" class="absolute top-6 right-6 opacity-70">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+            <h3 class="text-xl font-bold">Admin Login</h3>
+            <div class="relative">
+                <input type="password" id="adminPassInput" placeholder="Enter Password (default: admin123)" class="admin-input pr-10" style="background:var(--card-bg); color:var(--text-primary);">
+                <button type="button" onclick="togglePasswordVisibility('adminPassInput', 'toggleIconLogin')" class="absolute right-3 top-1/2 -translate-y-1/2 opacity-70 hover:opacity-100">
+                    <i class="fa-solid fa-eye text-xs" id="toggleIconLogin"></i>
+                </button>
+            </div>
+            <button onclick="verifyAdminPassword()" class="btn-aesthetic w-full text-xs uppercase font-mono py-3">Login</button>
+        </div>
+    </div>
+
+    <script>
+        let selectedLecSubject = 'All';
+        let selectedPdfSubject = 'All';
+
+        let lectures = JSON.parse(localStorage.getItem('nb_lectures')) || [
+            { id: 1, subject: 'Data Structures', topic: 'Binary Search Trees', title: 'BST Insertion & Traversal', url: 'https://www.youtube.com/embed/qH6sSOr-170' },
+            { id: 2, subject: 'Operating Systems', topic: 'Threads & Processes', title: 'Thread Concurrency & Multithreading', url: 'https://www.youtube.com/embed/LOfGJcviy7M' }
+        ];
+
+        let pdfs = JSON.parse(localStorage.getItem('nb_pdfs')) || [
+            { 
+                id: 1, 
+                subject: 'Database Systems', 
+                topic: 'SQL & Normalization', 
+                title: 'DBMS Complete Normalization Notes', 
+                url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
+                summaryEn: 'Covers 1NF, 2NF, 3NF, BCNF and relational algebra concepts.',
+                summaryHi: 'यह नोट डेटाबेस में 1NF, 2NF, 3NF और BCNF नॉर्मलाइजेशन समझाता है।'
+            }
+        ];
+
+        function switchPage(pageId) {
+            document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
+            document.querySelectorAll('.nav-btn').forEach(n => n.classList.remove('active'));
+            document.getElementById('page-' + pageId).classList.remove('hidden');
+            const activeNav = document.getElementById('nav-' + pageId);
+            if (activeNav) activeNav.classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function toggleTheme() {
+            const current = document.documentElement.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('nb_theme', next);
+            updateIcons(next);
+            initCanvas();
+        }
+
+        function updateIcons(theme) {
+            const cls = theme === 'light' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+            document.getElementById('themeIconMobile').className = cls;
+            document.getElementById('themeIconDesktop').className = cls;
+        }
+
+        function togglePasswordVisibility(inputId, iconId) {
+            const inputField = document.getElementById(inputId);
+            const iconField = document.getElementById(iconId);
+            if (inputField.type === 'password') {
+                inputField.type = 'text';
+                iconField.className = 'fa-solid fa-eye-slash text-xs';
+            } else {
+                inputField.type = 'password';
+                iconField.className = 'fa-solid fa-eye text-xs';
+            }
+        }
+
+        function checkAdminHash() {
+            if (window.location.hash === '#admin') {
+                if (sessionStorage.getItem('nb_admin_authenticated') === 'true') {
+                    switchPage('admin');
+                } else {
+                    document.getElementById('adminLoginModal').classList.remove('hidden');
+                }
+            } else {
+                document.getElementById('adminLoginModal').classList.add('hidden');
+            }
+        }
+        window.addEventListener('hashchange', checkAdminHash);
+
+        function filterLecSubject(sub) { selectedLecSubject = sub; renderContent(); }
+        function filterPdfSubject(sub) { selectedPdfSubject = sub; renderContent(); }
+
+        function deleteLecture(id) {
+            if (confirm("Kya aap sach me is lecture ko delete karna chahte hain?")) {
+                lectures = lectures.filter(lec => lec.id !== id);
+                localStorage.setItem('nb_lectures', JSON.stringify(lectures));
+                renderContent();
+            }
+        }
+
+        function deletePdfNote(id) {
+            if (confirm("Kya aap sach me is PDF note ko delete karna chahte hain?")) {
+                pdfs = pdfs.filter(pdf => pdf.id !== id);
+                localStorage.setItem('nb_pdfs', JSON.stringify(pdfs));
+                renderContent();
+            }
+        }
+
+        function updateAdminPassword() {
+            const newPwd = document.getElementById('newAdminPwd').value;
+            if (!newPwd || newPwd.trim() === '') {
+                alert("Please enter a valid new password!");
+                return;
+            }
+            localStorage.setItem('nb_admin_pwd', newPwd.trim());
+            alert("Admin password updated successfully!");
+            document.getElementById('newAdminPwd').value = '';
+        }
+
+        function renderContent() {
+            document.getElementById('homeLectureCount').innerText = lectures.length;
+            document.getElementById('homePdfCount').innerText = pdfs.length;
+
+            document.getElementById('homeVideoGrid').innerHTML = lectures.slice(0, 3).map(lec => `
+                <div class="glass-card rounded-3xl p-5 flex flex-col justify-between space-y-3">
+                    <div class="aspect-video w-full rounded-2xl overflow-hidden bg-black/10">
+                        <iframe src="${lec.url}" class="w-full h-full" frameborder="0" allowfullscreen></iframe>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="tab-btn text-[10px] py-0.5 px-2.5">${lec.subject}</span>
+                        <span class="text-[10px] font-mono opacity-70">${lec.topic}</span>
+                    </div>
+                    <h4 class="font-bold text-base leading-snug">${lec.title}</h4>
+                </div>
+            `).join('');
+
+            document.getElementById('homePdfGrid').innerHTML = pdfs.slice(0, 3).map(pdf => `
+                <div class="glass-card rounded-3xl p-6 flex flex-col justify-between space-y-4">
+                    <div class="flex justify-between items-center">
+                        <i class="fa-solid fa-file-pdf text-3xl opacity-60"></i>
+                        <span class="tab-btn text-[10px] py-0.5 px-2.5">${pdf.subject}</span>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-mono opacity-70">${pdf.topic}</p>
+                        <h4 class="font-bold text-base leading-snug mt-1">${pdf.title}</h4>
+                    </div>
+                    <div class="space-y-2 pt-2">
+                        <button onclick="openSummaryModal('${encodeURIComponent(pdf.title)}', '${encodeURIComponent(pdf.summaryEn)}', '${encodeURIComponent(pdf.summaryHi)}')" class="btn-view-summary w-full">View Summary</button>
+                        <a href="${pdf.url}" target="_blank" download class="btn-aesthetic flex items-center justify-center gap-2 w-full text-xs uppercase py-2.5">
+                            <i class="fa-solid fa-arrow-down-long text-xs"></i> <span>Download PDF</span>
+                        </a>
+                    </div>
+                </div>
+            `).join('');
+
+            const lecSubjects = ['All', ...new Set(lectures.map(l => l.subject))];
+            document.getElementById('lectureSubjectTabs').innerHTML = lecSubjects.map(sub => `
+                <button onclick="filterLecSubject('${sub}')" class="tab-btn ${selectedLecSubject === sub ? 'active' : ''}">${sub}</button>
+            `).join('');
+
+            const pdfSubjects = ['All', ...new Set(pdfs.map(p => p.subject))];
+            document.getElementById('pdfSubjectTabs').innerHTML = pdfSubjects.map(sub => `
+                <button onclick="filterPdfSubject('${sub}')" class="tab-btn ${selectedPdfSubject === sub ? 'active' : ''}">${sub}</button>
+            `).join('');
+
+            const filteredLecs = selectedLecSubject === 'All' ? lectures : lectures.filter(l => l.subject === selectedLecSubject);
+            const lecsByTopic = {};
+            filteredLecs.forEach(l => {
+                if (!lecsByTopic[l.topic]) lecsByTopic[l.topic] = [];
+                lecsByTopic[l.topic].push(l);
+            });
+
+            document.getElementById('fullVideoGrid').innerHTML = Object.keys(lecsByTopic).length ? Object.keys(lecsByTopic).map(topic => `
+                <div class="space-y-4">
+                    <h4 class="text-xl font-bold border-b border-current pb-2 opacity-90"><i class="fa-solid fa-folder-open text-sm mr-2 opacity-70"></i>${topic}</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        ${lecsByTopic[topic].map(lec => `
+                            <div class="glass-card rounded-3xl p-5 space-y-3">
+                                <div class="aspect-video w-full rounded-2xl overflow-hidden bg-black/10">
+                                    <iframe src="${lec.url}" class="w-full h-full" frameborder="0" allowfullscreen></iframe>
+                                </div>
+                                <span class="tab-btn text-[10px] py-0.5 px-2.5">${lec.subject}</span>
+                                <h5 class="font-bold text-sm leading-snug">${lec.title}</h5>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('') : '<p class="text-xs font-mono opacity-70">No lectures found.</p>';
+
+            const filteredPdfs = selectedPdfSubject === 'All' ? pdfs : pdfs.filter(p => p.subject === selectedPdfSubject);
+            const pdfsByTopic = {};
+            filteredPdfs.forEach(p => {
+                if (!pdfsByTopic[p.topic]) pdfsByTopic[p.topic] = [];
+                pdfsByTopic[p.topic].push(p);
+            });
+
+            document.getElementById('fullPdfGrid').innerHTML = Object.keys(pdfsByTopic).length ? Object.keys(pdfsByTopic).map(topic => `
+                <div class="space-y-4">
+                    <h4 class="text-xl font-bold border-b border-current pb-2 opacity-90"><i class="fa-solid fa-folder-open text-sm mr-2 opacity-70"></i>${topic}</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        ${pdfsByTopic[topic].map(pdf => `
+                            <div class="glass-card rounded-3xl p-6 space-y-4 flex flex-col justify-between">
+                                <div>
+                                    <div class="flex justify-between items-center mb-3">
+                                        <i class="fa-solid fa-file-pdf text-3xl opacity-60"></i>
+                                        <span class="tab-btn text-[10px] py-0.5 px-2.5">${pdf.subject}</span>
+                                    </div>
+                                    <h5 class="font-bold text-sm leading-snug">${pdf.title}</h5>
+                                </div>
+                                <div class="space-y-2 pt-2">
+                                    <button onclick="openSummaryModal('${encodeURIComponent(pdf.title)}', '${encodeURIComponent(pdf.summaryEn)}', '${encodeURIComponent(pdf.summaryHi)}')" class="btn-view-summary w-full">View Summary</button>
+                                    <a href="${pdf.url}" target="_blank" download class="btn-aesthetic flex items-center justify-center gap-2 w-full text-xs uppercase py-2.5">
+                                        <i class="fa-solid fa-arrow-down-long text-xs"></i> <span>Download PDF Note</span>
+                                    </a>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('') : '<p class="text-xs font-mono opacity-70">No study notes found.</p>';
+
+            document.getElementById('adminLecturesList').innerHTML = lectures.map(lec => `
+                <div class="admin-inverted-card p-3 rounded-2xl text-xs flex justify-between items-center" style="border:1px solid rgba(128,128,128,0.2);">
+                    <div>
+                        <p class="font-bold leading-tight">${lec.title}</p>
+                        <p class="text-[10px] font-mono opacity-70">${lec.subject} • ${lec.topic}</p>
+                    </div>
+                    <button onclick="deleteLecture(${lec.id})" class="btn-delete flex items-center gap-1">
+                        <i class="fa-solid fa-trash"></i> Delete
+                    </button>
+                </div>
+            `).join('') || '<p class="text-xs opacity-70">No lectures uploaded.</p>';
+
+            document.getElementById('adminPdfsList').innerHTML = pdfs.map(pdf => `
+                <div class="admin-inverted-card p-3 rounded-2xl text-xs flex justify-between items-center" style="border:1px solid rgba(128,128,128,0.2);">
+                    <div>
+                        <p class="font-bold leading-tight">${pdf.title}</p>
+                        <p class="text-[10px] font-mono opacity-70">${pdf.subject} • ${pdf.topic}</p>
+                    </div>
+                    <button onclick="deletePdfNote(${pdf.id})" class="btn-delete flex items-center gap-1">
+                        <i class="fa-solid fa-trash"></i> Delete
+                    </button>
+                </div>
+            `).join('') || '<p class="text-xs opacity-70">No PDF notes uploaded.</p>';
+        }
+
+        function openSummaryModal(t, en, hi) {
+            document.getElementById('modalPdfTitle').innerText = decodeURIComponent(t);
+            document.getElementById('modalEnglishSummary').innerText = decodeURIComponent(en);
+            document.getElementById('modalHindiSummary').innerText = decodeURIComponent(hi);
+            document.getElementById('summaryModal').classList.remove('hidden');
+        }
+        function closeSummaryModal() { document.getElementById('summaryModal').classList.add('hidden'); }
+
+        function addNewLecture() {
+            const subject = document.getElementById('adminLecSubject').value;
+            const topic = document.getElementById('adminLecTopic').value;
+            const title = document.getElementById('adminLecTitle').value;
+            const url = document.getElementById('adminLecUrl').value;
+            if(!subject || !topic || !title || !url) return alert("Fill all fields!");
+
+            lectures.unshift({ id: Date.now(), subject, topic, title, url });
+            localStorage.setItem('nb_lectures', JSON.stringify(lectures));
+            renderContent();
+            alert("Lecture published!");
+            document.getElementById('adminLecSubject').value = '';
+            document.getElementById('adminLecTopic').value = '';
+            document.getElementById('adminLecTitle').value = '';
+            document.getElementById('adminLecUrl').value = '';
+        }
+
+        function addNewPdfNote() {
+            const subject = document.getElementById('adminPdfSubject').value;
+            const topic = document.getElementById('adminPdfTopic').value;
+            const title = document.getElementById('adminPdfTitle').value;
+            const summaryEn = document.getElementById('adminPdfEn').value;
+            const summaryHi = document.getElementById('adminPdfHi').value;
+            if(!subject || !topic || !title || !summaryEn || !summaryHi) return alert("Fill all fields!");
+
+            pdfs.unshift({ id: Date.now(), subject, topic, title, url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf', summaryEn, summaryHi });
+            localStorage.setItem('nb_pdfs', JSON.stringify(pdfs));
+            renderContent();
+            alert("Study note published!");
+            document.getElementById('adminPdfSubject').value = '';
+            document.getElementById('adminPdfTopic').value = '';
+            document.getElementById('adminPdfTitle').value = '';
+            document.getElementById('adminPdfEn').value = '';
+            document.getElementById('adminPdfHi').value = '';
+        }
+
+        function verifyAdminPassword() {
+            const currentAdminPwd = localStorage.getItem('nb_admin_pwd') || 'admin123';
+            if (document.getElementById('adminPassInput').value === currentAdminPwd) {
+                sessionStorage.setItem('nb_admin_authenticated', 'true');
+                document.getElementById('adminLoginModal').classList.add('hidden');
+                switchPage('admin');
+            } else { alert("Incorrect Password!"); }
+        }
+        function cancelAdminLogin() { window.location.hash = ''; switchPage('home'); }
+        function exitAdminPortal() { sessionStorage.removeItem('nb_admin_authenticated'); window.location.hash = ''; switchPage('home'); }
+
+        /* Mouse Neural Canvas */
+        const canvas = document.getElementById('neural-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [], mouse = { x: null, y: null, radius: 180 };
+        window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+        window.addEventListener('mouseout', () => { mouse.x = null; mouse.y = null; });
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+
+        class Node {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.vx = (Math.random() - 0.5) * 0.7;
+                this.vy = (Math.random() - 0.5) * 0.7;
+                this.radius = Math.random() * 2 + 1;
+            }
+            update() {
+                this.x += this.vx; this.y += this.vy;
+                if(this.x < 0 || this.x > canvas.width) this.vx *= -1;
+                if(this.y < 0 || this.y > canvas.height) this.vy *= -1;
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = document.documentElement.getAttribute('data-theme') === 'dark' ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.4)';
+                ctx.fill();
+            }
+        }
+
+        function initCanvas() {
+            resize(); particles = [];
+            for(let i=0; i < Math.floor((canvas.width * canvas.height) / 11000); i++) particles.push(new Node());
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            for(let i=0; i<particles.length; i++) {
+                particles[i].update(); particles[i].draw();
+                for(let j=i+1; j<particles.length; j++) {
+                    let dx = particles[i].x - particles[j].x, dy = particles[i].y - particles[j].y, dist = Math.sqrt(dx*dx + dy*dy);
+                    if(dist < 130) {
+                        ctx.beginPath(); ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.strokeStyle = isDark ? `rgba(255,255,255,${(1-dist/130)*0.25})` : `rgba(0,0,0,${(1-dist/130)*0.25})`;
+                        ctx.lineWidth = 0.6; ctx.stroke();
+                    }
+                }
+                if(mouse.x !== null) {
+                    let mdx = particles[i].x - mouse.x, mdy = particles[i].y - mouse.y, mdist = Math.sqrt(mdx*mdx + mdy*mdy);
+                    if(mdist < mouse.radius) {
+                        ctx.beginPath(); ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(mouse.x, mouse.y);
+                        ctx.strokeStyle = isDark ? `rgba(255,255,255,${(1-mdist/mouse.radius)*0.45})` : `rgba(0,0,0,${(1-mdist/mouse.radius)*0.45})`;
+                        ctx.lineWidth = 0.9; ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('resize', initCanvas);
+        document.addEventListener('DOMContentLoaded', () => {
+            const saved = localStorage.getItem('nb_theme') || 'light';
+            document.documentElement.setAttribute('data-theme', saved);
+            updateIcons(saved); renderContent(); initCanvas(); animate(); checkAdminHash();
+        });
+    </script>
+</body>
+</html>
